@@ -1,28 +1,56 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 import AppBar from "./components/appbar";
 import SignIn from "./screens/signin_screen";
 import SignUp from "./screens/signup_screen";
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#0D9276",
+    },
+    secondary: {
+      main: "#40A2E3",
+    },
+  },
+});
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <SignUp />,
+    element: (
+      <div>
+        <AppBar />
+        <SignUp />
+      </div>
+    ),
   },
   {
     path: "/signup",
-    element: <SignUp />,
+    element: (
+      <div>
+        <AppBar />
+        <SignUp />
+      </div>
+    ),
   },
   {
     path: "/signin",
-    element: <SignIn />,
+    element: (
+      <div>
+        <AppBar />
+        <SignIn />
+      </div>
+    ),
   },
 ]);
 
 function App() {
   return (
     <>
-      <AppBar />
-      <RouterProvider router={router}></RouterProvider>
+      <ThemeProvider theme={theme}>
+        <RouterProvider router={router}></RouterProvider>
+      </ThemeProvider>
     </>
   );
 }
