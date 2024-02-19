@@ -3,6 +3,7 @@ import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 import AppBar from "./components/appbar";
 import SignIn from "./screens/signin_screen";
 import SignUp from "./screens/signup_screen";
+import NotesScreen from "./screens/notes_screen";
 
 const theme = createTheme({
   palette: {
@@ -40,6 +41,15 @@ const router = createBrowserRouter([
       <div>
         <AppBar />
         <SignIn />
+      </div>
+    ),
+  },
+  {
+    path: "/notes",
+    element: (
+      <div>
+        <AppBar />
+        <NotesScreen />
       </div>
     ),
   },

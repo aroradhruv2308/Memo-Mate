@@ -1,10 +1,31 @@
 import { Card, Typography, TextField, Checkbox, Button } from "@mui/material";
 import { useState } from "react";
-
+import { registerUser } from "../services/userServices.js";
+import { useNavigate } from "react-router-dom";
 function SignUp() {
+  const navigate = useNavigate();
   let [isChecked, setChecked] = useState(false);
-  function onChange(event) {
-    setChecked(event.target.checked);
+  let [usercreds, setUsercreds] = useState({ username: "", password: "" });
+
+  function usernameOnChange(event) {
+    setUsercreds((prevState) => ({
+      ...prevState,
+      username: event.target.value,
+    }));
+  }
+
+  function passwordOnChange(event) {
+    setUsercreds((prevState) => ({
+      ...prevState,
+      password: event.target.value,
+    }));
+  }
+
+  async function onRegister() {
+    let res = await registerUser(usercreds);
+    if (res.status == 200) {
+      navigate("/notes");
+    }
   }
   return (
     <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
@@ -37,6 +58,7 @@ function SignUp() {
             </div>
             <div>
               <TextField
+                onChange={usernameOnChange}
                 id="outlined-basic"
                 label="Username"
                 variant="outlined"
@@ -45,21 +67,13 @@ function SignUp() {
             </div>
             <div>
               <TextField
+                onChange={passwordOnChange}
                 id="outlined-basic"
                 label="Password"
                 variant="outlined"
                 sx={{ marginTop: "20px" }}
               />
             </div>
-            <div>
-              <TextField
-                id="outlined-basic"
-                label="Phone No"
-                variant="outlined"
-                sx={{ marginTop: "20px" }}
-              />
-            </div>
-
             <div
               style={{
                 display: "flex",
@@ -67,7 +81,9 @@ function SignUp() {
                 alignItems: "center",
               }}
             ></div>
-            <Button sx={{ marginTop: "10px" }}>Register</Button>
+            <Button sx={{ marginTop: "10px" }} onClick={onRegister}>
+              Register
+            </Button>
           </div>
         </div>
       </Card>

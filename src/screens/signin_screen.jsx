@@ -1,10 +1,32 @@
 import { Card, Typography, TextField, Checkbox, Button } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/userServices.js";
 
 function SignIn() {
+  const navigate = useNavigate();
   let [isChecked, setChecked] = useState(false);
-  function onChange(event) {
-    setChecked(event.target.checked);
+  let [usercreds, setUsercreds] = useState({ username: "", password: "" });
+
+  function usernameOnChange(event) {
+    setUsercreds((prevState) => ({
+      ...prevState,
+      username: event.target.value,
+    }));
+  }
+
+  function passwordOnChange(event) {
+    setUsercreds((prevState) => ({
+      ...prevState,
+      password: event.target.value,
+    }));
+  }
+
+  async function onLogin() {
+    let res = await loginUser(usercreds);
+    if (res.status == 200) {
+      navigate("/notes");
+    }
   }
   return (
     <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
@@ -37,6 +59,7 @@ function SignIn() {
             </div>
             <div>
               <TextField
+                onChange={usernameOnChange}
                 id="outlined-basic"
                 label="Username"
                 variant="outlined"
@@ -45,6 +68,7 @@ function SignIn() {
             </div>
             <div>
               <TextField
+                onChange={passwordOnChange}
                 id="outlined-basic"
                 label="Password"
                 variant="outlined"
@@ -59,7 +83,9 @@ function SignIn() {
                 alignItems: "center",
               }}
             ></div>
-            <Button sx={{ marginTop: "10px" }}>Login</Button>
+            <Button sx={{ marginTop: "10px" }} onClick={onLogin}>
+              Login
+            </Button>
           </div>
         </div>
       </Card>
