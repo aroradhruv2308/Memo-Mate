@@ -2,7 +2,7 @@ import { Card, Typography, TextField, Checkbox, Button } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/userServices.js";
-
+import { fetchNotesForThisUser } from "../services/notesServices.js";
 function SignIn() {
   const navigate = useNavigate();
   let [isChecked, setChecked] = useState(false);
@@ -24,8 +24,12 @@ function SignIn() {
 
   async function onLogin() {
     let res = await loginUser(usercreds);
+    console.log(res);
+    console.log(res.status);
     if (res.status == 200) {
-      navigate("/notes");
+      let result = await fetchNotesForThisUser(res.data.token);
+      console.log(result.data.notes);
+      navigate("/notes", { state: { data: result.data.notes } });
     }
   }
   return (

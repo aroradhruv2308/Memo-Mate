@@ -23,7 +23,6 @@ export const loginUser = async (userCreds) => {
   };
 
   let data = {};
-
   let res = await axios.post("http://localhost:3000/signin", data, config);
   return res;
 };

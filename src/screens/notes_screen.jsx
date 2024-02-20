@@ -1,27 +1,30 @@
 import { Paper, Typography, TextField } from "@mui/material";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { updateNote } from "../services/notesServices.js";
 function NotesScreen() {
+  const location = useLocation();
+  const data = location.state.data;
+  console.log(data);
   const [expandedStates, setExpandedStates] = useState(
-    Array.from({ length: 2 }, () => false)
+    Array.from({ length: data.length }, () => false)
   );
-  let [details, setDetails] = useState([
-    {
-      title: "Go To Gym",
-      subTasks: ["wakeup at 5", "have your preworkout", "Go to Gym"],
-    },
-    {
-      title: "Study",
-      subTasks: [
-        "wakeup at 3",
-        "have your Coffee or Tea",
-        "Study Continuously",
-      ],
-    },
-  ]);
+  let [details, setDetails] = useState([]);
+  let [title, setTitle] = useState("");
+
+  let [subtitle, setSubtitle] = useState("");
+  data.forEach((element) => {
+    details.push(element);
+  });
   const handleExpandClick = (index) => {
     const newExpandedStates = [...expandedStates];
     newExpandedStates[index] = !newExpandedStates[index];
     setExpandedStates(newExpandedStates);
+  };
+
+  const handleUpdateNotes = async (index, note) => {
+    let result = await updateNote(res.data.token, index, note);
+    console.log(result);
   };
 
   const handleTitleChange = (event) => {
@@ -39,7 +42,6 @@ function NotesScreen() {
       {expandedStates.map((expanded, index) => (
         <Paper
           key={index}
-          onClick={() => handleExpandClick(index)}
           sx={{
             height: expanded ? "400px" : "200px",
             width: expanded ? "400px" : "200px",
@@ -49,10 +51,48 @@ function NotesScreen() {
             borderRadius: "30px",
             marginLeft: "10px",
             transition: "height 0.3s ease-in-out, width 0.3s ease-in-out",
-            cursor: "pointer",
             position: "relative",
           }}
         >
+          <div
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              cursor: "pointer",
+            }}
+            onClick={() => handleExpandClick(index)}
+          >
+            {!expanded ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  background: "black",
+                  color: "yellow",
+                  padding: "10px",
+                  height: "20px",
+                  width: "20px",
+                  borderRadius: "30px",
+                }}
+              >
+                +
+              </div>
+            ) : (
+              <div
+                style={{
+                  textAlign: "center",
+                  background: "black",
+                  color: "yellow",
+                  padding: "10px",
+                }}
+                onClick={() =>
+                  handleUpdateNotes(index, { title: title, subtitle: "" })
+                }
+              >
+                Save Changes
+              </div>
+            )}
+          </div>
           <div style={{ padding: "20px" }}>
             {!expanded ? (
               <Typography variant="h3" sx={{ fontSize: "40px" }}>
