@@ -1,21 +1,45 @@
 import { Paper, Typography, TextField } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { updateNote } from "../services/notesServices.js";
-function NotesScreen() {
-  const location = useLocation();
-  const data = location.state.data;
-  console.log(data);
-  const [expandedStates, setExpandedStates] = useState(
-    Array.from({ length: data.length }, () => false)
-  );
-  let [details, setDetails] = useState([]);
-  let [title, setTitle] = useState("");
+import {
+  updateNote,
+  deleteNote,
+  fetchNotesForThisUser,
+} from "../services/notesServices.js";
+import Cookies from "js-cookie";
 
-  let [subtitle, setSubtitle] = useState("");
+function NotesScreen() {
+  let location = useLocation();
+  let data = location.state.data;
+  let [details, setDetails] = useState([]);
   data.forEach((element) => {
     details.push(element);
   });
+  let [expandedStates, setExpandedStates] = useState(
+    Array.from({ length: data.length }, () => false)
+  );
+
+  let [dataUpdated, setDataUpdated] = useState(false);
+  let [title, setTitle] = useState("");
+
+  let [subtitle, setSubtitle] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await fetchNotesForThisUser(Cookies.get("token"));
+        console.log("got res", result);
+        const newData = result.data.notes;
+        setDetails(newData);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      }
+    };
+
+    console.log("useEffect was called!!");
+    fetchData();
+  }, [dataUpdated]);
+
   const handleExpandClick = (index) => {
     const newExpandedStates = [...expandedStates];
     newExpandedStates[index] = !newExpandedStates[index];
@@ -23,8 +47,13 @@ function NotesScreen() {
   };
 
   const handleUpdateNotes = async (index, note) => {
-    let result = await updateNote(res.data.token, index, note);
-    console.log(result);
+    let result = await updateNote(Cookies.get("token"), index, note);
+    setDataUpdated(!dataUpdated);
+  };
+
+  const handleDeleteNotes = async (index, note) => {
+    let result = await deleteNote(Cookies.get("token"), index);
+    setDataUpdated(!dataUpdated);
   };
 
   const handleTitleChange = (event) => {
@@ -37,6 +66,7 @@ function NotesScreen() {
   const handleDetailsChange = (event) => {
     setDetails(event.target.value);
   };
+  console.log();
   return (
     <div style={{ marginTop: "40px", display: "flex", flexWrap: "wrap" }}>
       {expandedStates.map((expanded, index) => (
@@ -58,6 +88,33 @@ function NotesScreen() {
             style={{
               position: "absolute",
               bottom: "20px",
+              right: "60px",
+              cursor: "pointer",
+            }}
+          >
+            {!expanded ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  background: "white",
+                  color: "red",
+                  padding: "10px",
+                  borderRadius: "30px",
+                }}
+                onClick={() =>
+                  handleDeleteNotes(index, { title: title, subtitle: "" })
+                }
+              >
+                delete
+              </div>
+            ) : (
+              <div></div>
+            )}
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              bottom: "20px",
               right: "20px",
               cursor: "pointer",
             }}
@@ -74,6 +131,7 @@ function NotesScreen() {
                   width: "20px",
                   borderRadius: "30px",
                 }}
+                onClick={() => handleExpandClick(index)}
               >
                 +
               </div>
@@ -110,8 +168,8 @@ function NotesScreen() {
                   }}
                   focused={true}
                   onFocus={(e) => e.target.select()}
+                  onChange={handleTitleChange}
                   autoFocus
-                  onClick={handleTextFieldClick}
                 />
               </div>
             )}
